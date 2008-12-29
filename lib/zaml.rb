@@ -231,15 +231,15 @@ class String
         end
     def to_zaml(z)
         z.first_time_only(self) {
-            case
-              when self == ''
+            case self
+              when ''
                 z.emit('""')
               # when self =~ /[\x00-\x08\x0B\x0C\x0E-\x1F\x80-\xFF]/
               #   z.emit("!binary |\n")
               #   z.emit([self].pack("m*"))
               when *ESCAPE_CASES
                 z.emit("\"#{escaped_for_zaml}\"")
-              when self =~ /\n/
+              when /\n/
                 if self[-1..-1] == "\n" then z.emit('|+') else z.emit('|-') end
                 z.nested { split("\n",-1).each { |line| z.nl; z.emit(line.chomp("\n")) } }
                 z.nl
