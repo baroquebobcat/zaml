@@ -14,6 +14,8 @@ require 'yaml'
 
 class ZAML
     VERSION = "0.1.1"
+    
+    DEFAULTS = {:use_labels=> true}
     #
     # Class Methods
     #
@@ -79,14 +81,15 @@ class ZAML
         Label.new(obj,(Hash === obj || Array === obj) ? "#{@indent || "\n"}  " : ' ')
         end
     def first_time_only(obj)
-        if label = Label.for(obj)
+     
+          if DEFAULTS[:use_labels] && label = Label.for(obj)
             emit(label.reference)
           else
             if @structured_key_prefix and not obj.is_a? String
                 emit(@structured_key_prefix) 
                 @structured_key_prefix = nil
                 end
-            emit(new_label_for(obj))
+            emit(new_label_for(obj)) if DEFAULTS[:use_labels]
             yield
           end
         end
