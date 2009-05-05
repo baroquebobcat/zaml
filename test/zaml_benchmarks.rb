@@ -1,20 +1,6 @@
-require 'test/unit'
+require File.dirname(__FILE__)+'/test_helper'
 require 'benchmark'
-require 'yaml'
 require 'tempfile'
-
-require 'zaml'
-
-class My_class
-    def initialize
-        @string = 'string...'
-        @self = self
-        @do_not_store_me = '*************** SHOULD NOT SHOW UP IN OUTPUT ***************'
-        end
-    def to_yaml_properties
-        ['@string', '@self']
-        end
-    end
 
 class ZamlBenchmarks < Test::Unit::TestCase
     #
