@@ -216,6 +216,16 @@ class Exception
 
 class String
     ZAML_ESCAPES = %w{\x00 \x01 \x02 \x03 \x04 \x05 \x06 \a \x08 \t \n \v \f \r \x0e \x0f \x10 \x11 \x12 \x13 \x14 \x15 \x16 \x17 \x18 \x19 \x1a \e \x1c \x1d \x1e \x1f }
+    
+    num = '[-+]?(0x)?\d+\.?\d*'
+    ESCAPE_CASES = [
+      /\A(true|false|yes|no|on|null|off|#{num}(:#{num})*|!|=|~)$/i,
+      /\A(\n* |[-:?!#&*'"]|<<|%.+:.)/,
+      /\s$/,
+      /^[>|][-+\d]*\s/i,
+      /[\x00-\x08\x0B\x0C\x0E-\x1F\x80-\xFF]|[,\[\]\{\}\r\t]|:\s|\s#/
+    ]
+    
     def escaped_for_zaml
         gsub( /\x5C/, "\\\\\\" ).  # Demi-kludge for Maglev/rubinius; the regexp should be /\\/ but parsetree chokes on that.
         gsub( /"/, "\\\"" ).
@@ -223,26 +233,16 @@ class String
         gsub( /([\x80-\xFF])/ ) { |x| "\\x#{x.unpack("C")[0].to_s(16)}" }
         end
     def to_zaml(z)
-        z.first_time_only(self) { 
-            num = '[-+]?(0x)?\d+\.?\d*'
-            case
-              when self == ''
+        z.first_time_only(self) {
+            case self
+              when ''
                 z.emit('""')
               # when self =~ /[\x00-\x08\x0B\x0C\x0E-\x1F\x80-\xFF]/
               #   z.emit("!binary |\n")
               #   z.emit([self].pack("m*"))
-              when (
-                    (self =~ /\A(true|false|yes|no|on|null|off|#{num}(:#{num})*|!|=|~)$/i) or 
-                    (self =~ /\A\n* /) or
-                    (self =~ /\s$/) or
-                    (self =~ /^[>|][-+\d]*\s/i) or
-                    (self[-1..-1] =~ /\s/) or 
-                    (self =~ /[\x00-\x08\x0B\x0C\x0E-\x1F\x80-\xFF]/) or
-                    (self =~ /[,\[\]\{\}\r\t]|:\s|\s#/) or 
-                    (self =~ /\A([-:?!#&*'"]|<<|%.+:.)/) 
-                    )
+              when *ESCAPE_CASES
                 z.emit("\"#{escaped_for_zaml}\"")
-              when self =~ /\n/
+              when /\n/
                 if self[-1..-1] == "\n" then z.emit('|+') else z.emit('|-') end
                 z.nested { split("\n",-1).each { |line| z.nl; z.emit(line.chomp("\n")) } }
                 z.nl
