@@ -10,8 +10,6 @@
 # Authors: Markus Roberts, Jesse Hallett, Ian McIntosh, Igal Koshevoy, Simon Chiang
 # 
 
-require 'yaml'
-
 class ZAML
     VERSION = "0.1.1"
     
@@ -151,6 +149,13 @@ class Object
 #   Behavior for built-in classes
 #
 ################################################################
+class Object
+    def to_yaml
+        z=ZAML.new
+        to_zaml z
+        z.to_s
+        end
+    end
 
 class NilClass
     def to_zaml(z)
