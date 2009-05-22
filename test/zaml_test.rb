@@ -325,8 +325,7 @@ class ZamlDumpTest < Test::Unit::TestCase
     #label configuration
     #
     def test_labels_on
-        defaults = ZAML::DEFAULTS.clone
-        ZAML::DEFAULTS.merge! :use_labels => true
+        set_defaults :use_labels => true
         result = ZAML.dump( {"data"=>(1..2).map{|i|{"a"=>i,"b"=>i+1}}})
         expected= "--- 
   data: 
@@ -335,11 +334,10 @@ class ZamlDumpTest < Test::Unit::TestCase
     - *id001: 2
       *id002: 3"
         assert result == expected, "expected \"#{expected}\" but was \"#{result}\""
-        ZAML::DEFAULTS.merge! defaults
+        restore_defaults
         end
     def test_labels_off
-        defaults = ZAML::DEFAULTS.clone
-        ZAML::DEFAULTS.merge! :use_labels => false
+        set_defaults :use_labels => false
         result = ZAML.dump( {"data"=>(1..2).map{|i|{"a"=>i,"b"=>i+1}}})
         expected= "--- 
   data: 
@@ -348,7 +346,7 @@ class ZamlDumpTest < Test::Unit::TestCase
     - a: 2
       b: 3"
         assert result == expected, "expected \"#{expected}\" but was \"#{result}\""
-        ZAML::DEFAULTS.merge! defaults
+        restore_defaults
         end
     #
     # Indent config

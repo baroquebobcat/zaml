@@ -100,3 +100,12 @@ def dump_test(obj)
 #             assert_equal stripped(y_dump),stripped(z_dump), "Dump discrepancy"
 #             end
     end
+    
+#utilities for adding and removing defaults
+def set_defaults opts
+    $zaml_defaults ||= ZAML::DEFAULTS.clone
+    ZAML::DEFAULTS.merge! opts
+    end
+def restore_defaults
+    ZAML::DEFAULTS.merge! $zaml_defaults
+    end
