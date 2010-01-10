@@ -11,9 +11,8 @@
 # 
 
 class ZAML
-    VERSION = "0.1.1"
-    
     DEFAULTS = {:use_labels=> true}
+    VERSION = "0.1.2"
     #
     # Class Methods
     #
